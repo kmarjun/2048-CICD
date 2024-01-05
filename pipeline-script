@@ -1,0 +1,56 @@
+pipeline {
+    agent any
+    tools {
+        jdk 'jdk17'
+        nodejs 'node16'
+    }
+
+    environment {
+        KUBECONFIG_CREDENTIALS = credentials('kubeconfig')
+        AWS_ACCESS_KEY_ID= 'AKIAW7WRLLCWAPH4WTX4'
+        AWS_SECRET_ACCESS_KEY= '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'
+    }
+
+    stages {
+        stage('Clean workspace') {
+            steps {
+                cleanWs()
+            }
+        }
+
+        stage('Checkout from Git') {
+            steps {
+                git branch: 'main', url: 'https://github.com/kmarjun/2048-CICD.git'
+            }
+        }
+
+        stage('Docker build and push') {
+            steps {
+                script {
+                    withDockerRegistry(credentialsId: 'docker-token', toolName: 'docker') {
+                        sh 'docker build -t 2048 .'
+                    }
+                }
+            }
+        }
+
+        stage('Connect to Kubernetes and Deploy') {
+            steps {
+                script {
+                    // Use the kubeconfig file provided as a Jenkins credential
+                    withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
+                        // Set environment variables
+                        withEnv([
+                            "KUBECONFIG=${KUBECONFIG}",
+                            "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}",
+                            "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}"
+                        ]) {
+                            // Your kubectl apply command here
+                            sh 'kubectl apply -f deployment.yaml'
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
