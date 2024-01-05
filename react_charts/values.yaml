@@ -1,0 +1,13 @@
+# myreactapp/values.yaml
+replicaCount: 3
+
+image:
+  repository: aju2020/2048cicd
+  tag: latest
+
+containerPort: 3000
+
+service:
+  port: 80
+  type: LoadBalancer
+

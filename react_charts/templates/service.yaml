@@ -1,0 +1,14 @@
+# myreactapp/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "myreactapp.fullname" . }}
+spec:
+  selector:
+    app: {{ include "myreactapp.name" . }}
+  ports:
+    - protocol: TCP
+      port: {{ .Values.service.port }}
+      targetPort: {{ .Values.containerPort }}
+  type: {{ .Values.service.type }}
+

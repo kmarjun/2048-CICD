@@ -1,0 +1,6 @@
+# myreactapp/Chart.yaml
+apiVersion: v2
+name: myreactapp
+description: A Helm chart for deploying a React application
+version: 0.1.0
+
